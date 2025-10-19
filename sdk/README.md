@@ -77,6 +77,15 @@ More Sample requests in
 ./examples/testing_server.sh
 ```
 
+
+## Output 
+The generated image is in 
+```
+./src/output
+```
+
+
+
 <!-- 
 ## Tech Stack
 
