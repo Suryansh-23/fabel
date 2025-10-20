@@ -2,130 +2,131 @@ BASE_URL="http://localhost:3000"
 
 
 # Testing the api/conversation endpoint
-echo "=== Example 1: Multi-User Conversation with Image Generation Request ==="
-echo "Scenario: User-1 posts about SpaceX, User-2 requests image with @mentions, @fabel AI generates"
-curl -X POST "$BASE_URL/api/conversation" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "messages": [
-      {
-        "role": "user",
-        "username": "User-1",
-        "content": [
-          {
-            "type": "text",
-            "text": "Successful launch of starships 11th ship to the space!"
-          }
-        ]
-      },
-      {
-        "role": "user",
-        "username": "User-2",
-        "content": [
-          {
-            "type": "text",
-            "text": "I am a @Base fellow, I wish I could see @Jesse_Pollak with @elon together celebrating this!"
-          }
-        ]
-      },
-      {
-        "role": "user",
-        "username": "fabel",
-        "content": [
-          {
-            "type": "text",
-            "text": "Generate the image for User-2 message!"
-          }
-        ]
-      }
-    ]
-  }'
-
-
-# Testing the api/conversation/concise endpoint of the server 
-echo -e "\n\n=== Example 8: Long Conversation with Concise Summary ==="
-echo "Scenario: Long discussion thread, using concise endpoint"
-curl -X POST "$BASE_URL/api/conversation/concise" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "maxMessages": 3,
-    "messages": [
-      {
-        "role": "user",
-        "username": "alice",
-        "content": [{"type": "text", "text": "Starting a new project!"}]
-      },
-      {
-        "role": "user",
-        "username": "bob",
-        "content": [{"type": "text", "text": "What kind of project?"}]
-      },
-      {
-        "role": "user",
-        "username": "alice",
-        "content": [{"type": "text", "text": "A web3 gaming platform"}]
-      },
-      {
-        "role": "user",
-        "username": "charlie",
-        "content": [{"type": "text", "text": "Sounds awesome! Need any help?"}]
-      },
-      {
-        "role": "user",
-        "username": "alice",
-        "content": [{"type": "text", "text": "Yes! We need concept art"}]
-      },
-      {
-        "role": "user",
-        "username": "art_bot",
-        "content": [{"type": "text", "text": "Generate futuristic gaming concept art for a web3 platform"}]
-      }
-    ]
-  }'
-
-
-# echo -e "\n\n=== Example 2: Multi-User Thread with Image References ==="
-# echo "Scenario: Multiple users discussing a design with image attachments"
+# echo "=== Example 1: Multi-User Conversation with Image Generation Request ==="
+# echo "Scenario: User-1 posts about SpaceX, User-2 requests image with @mentions, @fabel AI generates"
 # curl -X POST "$BASE_URL/api/conversation" \
 #   -H "Content-Type: application/json" \
 #   -d '{
 #     "messages": [
 #       {
 #         "role": "user",
-#         "username": "designer_mike",
+#         "username": "User-1",
 #         "content": [
 #           {
 #             "type": "text",
-#             "text": "Check out this new logo concept I made"
-#           },
-#           {
-#             "type": "image",
-#             "imageUrl": "https://example.com/logo-v1.png"
+#             "text": "Successful launch of starships 11th ship to the space!"
 #           }
 #         ]
 #       },
 #       {
 #         "role": "user",
-#         "username": "product_sarah",
+#         "username": "User-2",
 #         "content": [
 #           {
 #             "type": "text",
-#             "text": "Love it! Can we see a version with our brand colors?"
+#             "text": "I am a @Base fellow, I wish I could see @Jesse_Pollak with @elon together celebrating this!"
 #           }
 #         ]
 #       },
 #       {
 #         "role": "user",
-#         "username": "ai_assistant",
+#         "username": "fabel",
 #         "content": [
 #           {
 #             "type": "text",
-#             "text": "Create an image variation using the brand color palette: blue #0066CC and orange #FF6600"
+#             "text": "Generate the image for User-2 message!"
 #           }
 #         ]
 #       }
 #     ]
 #   }'
+
+
+# # Testing the api/conversation/concise endpoint of the server 
+# echo -e "\n\n=== Example 8: Long Conversation with Concise Summary ==="
+# echo "Scenario: Long discussion thread, using concise endpoint"
+# curl -X POST "$BASE_URL/api/conversation/concise" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "maxMessages": 3,
+#     "messages": [
+#       {
+#         "role": "user",
+#         "username": "alice",
+#         "content": [{"type": "text", "text": "Starting a new project!"}]
+#       },
+#       {
+#         "role": "user",
+#         "username": "bob",
+#         "content": [{"type": "text", "text": "What kind of project?"}]
+#       },
+#       {
+#         "role": "user",
+#         "username": "alice",
+#         "content": [{"type": "text", "text": "A web3 gaming platform"}]
+#       },
+#       {
+#         "role": "user",
+#         "username": "charlie",
+#         "content": [{"type": "text", "text": "Sounds awesome! Need any help?"}]
+#       },
+#       {
+#         "role": "user",
+#         "username": "alice",
+#         "content": [{"type": "text", "text": "Yes! We need concept art"}]
+#       },
+#       {
+#         "role": "user",
+#         "username": "art_bot",
+#         "content": [{"type": "text", "text": "Generate futuristic gaming concept art for a web3 platform"}]
+#       }
+#     ]
+#   }'
+
+
+
+echo -e "\n\n=== Example 2: Multi-User Thread with Image References ==="
+echo "Scenario: Multiple users discussing a design with image attachments"
+curl -X POST "$BASE_URL/api/conversation" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {
+        "role": "user",
+        "username": "designer_mike",
+        "content": [
+          {
+            "type": "text",
+            "text": "Check out this new location that i visited "
+          },
+          {
+            "type": "image",
+            "imageUrl": "https://images.unsplash.com/photo-1591154669695-5f2a8d20c089?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1287"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "username": "product_sarah",
+        "content": [
+          {
+            "type": "text",
+            "text": "Love it! Can we have some celebrety with it?"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "username": "ai_assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create an image with Elon Musk in the place in the image"
+          }
+        ]
+      }
+    ]
+  }'
 
 # echo -e "\n\n=== Example 3: Video Generation Request in Team Chat ==="
 # echo "Scenario: Team discussing product demo video"

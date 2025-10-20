@@ -26,7 +26,7 @@ export class ConversationSummarizer {
             const content = this.formatMessageContent(msg);
             // Use username if available, otherwise use role
             const rolePrefix = msg.username ? `@${msg.username}` :
-                              (msg.role === 'user' ? 'User' : msg.role === 'assistant' ? 'Assistant' : 'System');
+                            (msg.role === 'user' ? 'User' : msg.role === 'assistant' ? 'Assistant' : 'System');
             summaryParts.push(`${rolePrefix}: ${content}`);
         });
 

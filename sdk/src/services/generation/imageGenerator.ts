@@ -51,7 +51,7 @@ export class ImageGenerator {
 
                 if (text) {
                     textResponse += text;
-                    console.log('Generated text:', text);
+                    // console.log('Generated text:', text);
                 }
 
                 if (data) {
@@ -86,7 +86,7 @@ export class ImageGenerator {
 
                 // Save to output folder
                 const timestamp = Date.now();
-                const outputDir = path.join(__dirname, '../output');
+                const outputDir = path.join(__dirname, '../../output');
                 const fileName = `generated_image_${timestamp}.png`;
                 const filePath = path.join(outputDir, fileName);
 

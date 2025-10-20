@@ -44,11 +44,11 @@ export class ConversationProcessor {
 
         // Step 2: Analyze the last message for intent (text/image/video) using Gemini
         const analysis = await this.analyzer.analyzeMessage(lastMessage, conversationHistory);
-        console.log('analysis', analysis);
+        console.log('Routing Analysis: ', analysis);
 
         // Step 3: Build summary from messages 0 to N-1 (conversational context)
         const summary = this.summarizer.summarize(messages);
-        console.log('summary', summary);
+        console.log('Summary: ', summary);
 
         // Step 4: Route to appropriate prompt based on analysis
         const selectedPrompt = this.router.route(analysis);

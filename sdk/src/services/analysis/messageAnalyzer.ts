@@ -13,7 +13,8 @@ export class MessageAnalyzer {
         if (!this.projectId) {
             throw new Error('GOOGLE_VERTEX_PROJECT is required for message analysis');
         }
-
+        
+        // Initialise the client for sending messages ...  
         this.client = new GoogleGenAI({
             vertexai: true,
             project: this.projectId,
@@ -43,10 +44,9 @@ export class MessageAnalyzer {
                 }
             }
 
-            // Parse the LLM response
             return this.parseAnalysisResponse(text);
         } catch (error) {
-            console.error('Error analyzing message with Gemini:', error);
+            console.error('Error analyzing message with Gemini: ', error);
             // Fallback to simple text intent
             return {
                 needsImageGeneration: false,
