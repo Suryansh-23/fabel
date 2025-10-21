@@ -84,7 +84,7 @@ BASE_URL="http://localhost:3000"
 #   }'
 
 
-
+# Prompt with Image reference inside the prompt ...., COMPLETE 
 echo -e "\n\n=== Example 2: Multi-User Thread with Image References ==="
 echo "Scenario: Multiple users discussing a design with image attachments"
 curl -X POST "$BASE_URL/api/conversation" \
@@ -97,11 +97,11 @@ curl -X POST "$BASE_URL/api/conversation" \
         "content": [
           {
             "type": "text",
-            "text": "Check out this new location that i visited "
+            "text": "Check out this new location that i visited recently"
           },
           {
             "type": "image",
-            "imageUrl": "https://images.unsplash.com/photo-1591154669695-5f2a8d20c089?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1287"
+            "imageUrl": "https://travelchardham.com/sites/default/files/2024-12/Photos%20of%20Mussoorie%20Mall%20Road.jpg"
           }
         ]
       },
@@ -121,7 +121,7 @@ curl -X POST "$BASE_URL/api/conversation" \
         "content": [
           {
             "type": "text",
-            "text": "Create an image with Elon Musk in the place in the image"
+            "text": "I want A photorealistic image of Elon Musk standing in front of this sign."
           }
         ]
       }

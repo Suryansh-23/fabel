@@ -6,6 +6,14 @@ export class ConversationSummarizer {
      * The last message (index N) is used to determine prompt routing (image/video/text)
      * Messages 0 to N-1 provide conversational context leading up to the current request
      */
+
+    /*  Further Extension to use a LLM for the summarisation, 
+        1. Set a summarisation final output window, 
+        2. Let us take y as the input window to the LLM, therefore making the output length of summariser to be y
+        3. y tokens or words... 
+        4. Calling it, optionally if the input word length x is above a certain threshold >= z
+            x >= z { threshold for the call to the LLM }
+    */
     summarize(messages: Message[]): string {
         if (messages.length === 0) {
             return 'No previous conversation context.';

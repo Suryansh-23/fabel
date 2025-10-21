@@ -20,10 +20,11 @@ export class ContextBuilder {
             };
         }
 
-        // Last message (index N) is the current request
+        // Use the image in any part of the conversationSummary 
         const lastMessage = messages[messages.length - 1];
         const currentMessageText = this.extractCurrentMessage(lastMessage);
-        const imageContext = this.extractImageContext(lastMessage);
+        const imageContext = this.extractImageContext(messages);
+        console.log("ImageContext... ", imageContext);
         const videoContext = this.extractVideoContext(messages);
 
         const placeholders: ContextPlaceholders = {
@@ -50,24 +51,41 @@ export class ContextBuilder {
     }
 
     /**
-     * Extract image context from the last message
-     * Includes both text references and actual images shared
+     * Extract image context from all messages
+     * Extracts images from content array where type is 'image'
      */
-    private extractImageContext(lastMessage: Message): string {
-        const imageContents = lastMessage.content.filter(c => c.type === 'image');
+    private extractImageContext(messages: Message[]): string {
+        const imageAddresses: string[] = [];
 
-        if (imageContents.length === 0) {
+        console.log('extractImageContext - Total messages:', messages.length);
+
+        // Search through all messages
+        messages.forEach((msg, msgIndex) => {
+            msg.content.forEach((content, _) => {
+                if (content.type === 'image') {
+                    // Extract imageUrl or imageData from image content
+                    if (content.imageUrl) {
+                        console.log(`  Found image URL in message ${msgIndex}:`, content.imageUrl);
+                        imageAddresses.push(content.imageUrl);
+                    } else if (content.imageData) {
+                        console.log(`  Found base64 image data in message ${msgIndex}`);
+                        imageAddresses.push('[Base64 encoded image data]');
+                    }
+                }
+            });
+        });
+
+        console.log('Total image addresses found:', imageAddresses.length);
+        console.log('Image addresses:', imageAddresses);
+
+        if (imageAddresses.length === 0) {
             return 'No images provided in current request.';
         }
 
-        const parts: string[] = [`${imageContents.length} image(s) included in the request:`];
+        const parts: string[] = [`${imageAddresses.length} image(s) included in the request:`];
 
-        imageContents.forEach((img, index) => {
-            if (img.imageUrl) {
-                parts.push(`Image ${index + 1}: ${img.imageUrl}`);
-            } else if (img.imageData) {
-                parts.push(`Image ${index + 1}: [Base64 encoded image data]`);
-            }
+        imageAddresses.forEach((address, index) => {
+            parts.push(`Image ${index + 1}: ${address}`);
         });
 
         return parts.join('\n');
@@ -87,7 +105,7 @@ export class ContextBuilder {
                 .join(' ');
 
             return text.includes('video') || text.includes('duration') ||
-                   text.includes('animation') || text.includes('scene');
+                text.includes('animation') || text.includes('scene');
         });
 
         if (videoRelatedMessages.length === 0) {

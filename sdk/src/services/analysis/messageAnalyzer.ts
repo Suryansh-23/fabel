@@ -37,6 +37,8 @@ export class MessageAnalyzer {
                 contents: analysisPrompt
             });
 
+            console.log("Response from Gemini-2.0-flash-exp : ", response);
+
             let text = '';
             for await (const chunk of response) {
                 if (chunk.text) {

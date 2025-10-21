@@ -1,6 +1,7 @@
 import { GoogleGenAI, Modality } from '@google/genai';
 import * as fs from 'fs';
 import * as path from 'path';
+import axios from 'axios';
 
 export interface ImageGenerationResult {
     success: boolean;
@@ -23,6 +24,8 @@ export class ImageGenerator {
             throw new Error('GOOGLE_VERTEX_PROJECT is required for image generation');
         }
 
+
+        console.log(`The project Id: ${this.projectId} & location : ${this.location}`)
         this.client = new GoogleGenAI({
             vertexai: true,
             project: this.projectId,
@@ -30,13 +33,49 @@ export class ImageGenerator {
         });
     }
 
-    async generateImage(prompt: string): Promise<ImageGenerationResult> {
+    async generateImage(prompt: string, imageUrl?: string): Promise<ImageGenerationResult> {
         try {
             console.log('Generating image with Google Gemini, prompt:', prompt);
+            if (imageUrl) {
+                console.log('Reference image URL:', imageUrl);
+            }
+
+            // Prepare the contents array for multimodal request
+            let contents: any;
+
+            if (imageUrl) {
+                // Fetch the image from URL and convert to base64
+                console.log('Fetching reference image from URL...');
+                const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+                const imageBase64 = Buffer.from(imageResponse.data, 'binary').toString('base64');
+
+                // Determine MIME type from response headers or URL extension
+                const contentType = imageResponse.headers['content-type'] || 'image/jpeg';
+                console.log('Reference image fetched, MIME type:', contentType);
+
+                // Construct multimodal contents with both text and image
+                contents = [
+                    {
+                        role: 'user',
+                        parts: [
+                            { text: prompt }, // The text prompt
+                            {
+                                inlineData: { // The reference image
+                                    mimeType: contentType,
+                                    data: imageBase64
+                                }
+                            }
+                        ]
+                    }
+                ];
+            } else {
+                // Text-only prompt
+                contents = prompt;
+            }
 
             const response = await this.client.models.generateContentStream({
                 model: 'gemini-2.5-flash-image',
-                contents: prompt,
+                contents: contents,
                 config: {
                     responseModalities: [Modality.TEXT, Modality.IMAGE],
                 },

@@ -47,23 +47,36 @@ export class ConversationProcessor {
         console.log('Routing Analysis: ', analysis);
 
         // Step 3: Build summary from messages 0 to N-1 (conversational context)
+        // ***************** Not optimised to the full potential *****************
         const summary = this.summarizer.summarize(messages);
         console.log('Summary: ', summary);
 
         // Step 4: Route to appropriate prompt based on analysis
         const selectedPrompt = this.router.route(analysis);
+        console.log("Selected Prompts Analysis: ", selectedPrompt);
 
         // Step 5: Build context placeholders
         const placeholders = this.contextBuilder.buildPlaceholders(messages, summary);
+        console.log(" Final Placeholders:  ", placeholders);
 
         // Step 6: Fill the prompt template with context
         const finalPrompt = this.contextBuilder.fillTemplate(selectedPrompt, placeholders);
+        console.log("Final Prompt sent : ", finalPrompt);
 
-        // Step 7: Generate image if needed
+        // For current testing always true
         let generatedImage;
         if (analysis.needsImageGeneration) {
             console.log('Generating image with final prompt...');
-            const imageResult = await this.imageGenerator.generateImage(finalPrompt);
+
+            // Extract image URLs from messages to use as reference
+            const allImages = this.contextBuilder.extractAllImages(messages);
+            const referenceImageUrl = allImages.length > 0 && allImages[0].url ? allImages[0].url : undefined;
+
+            if (referenceImageUrl) {
+                console.log('Using reference image:', referenceImageUrl);
+            }
+
+            const imageResult = await this.imageGenerator.generateImage(finalPrompt, referenceImageUrl);
             if (imageResult.success && imageResult.imageUrl) {
                 generatedImage = {
                     imageUrl: imageResult.imageUrl,
@@ -111,7 +124,16 @@ export class ConversationProcessor {
         let generatedImage;
         if (analysis.needsImageGeneration) {
             console.log('Generating image with final prompt...');
-            const imageResult = await this.imageGenerator.generateImage(finalPrompt);
+
+            // Extract image URLs from messages to use as reference
+            const allImages = this.contextBuilder.extractAllImages(messages);
+            const referenceImageUrl = allImages.length > 0 && allImages[0].url ? allImages[0].url : undefined;
+
+            if (referenceImageUrl) {
+                console.log('Using reference image:', referenceImageUrl);
+            }
+
+            const imageResult = await this.imageGenerator.generateImage(finalPrompt, referenceImageUrl);
             if (imageResult.success && imageResult.imageUrl) {
                 generatedImage = {
                     imageUrl: imageResult.imageUrl,
