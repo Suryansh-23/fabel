@@ -53,6 +53,7 @@ export class ContextBuilder {
     /**
      * Extract image context from all messages
      * Extracts images from content array where type is 'image'
+     * Also extracts image URLs found in text content
      */
     private extractImageContext(messages: Message[]): string {
         const imageAddresses: string[] = [];
@@ -70,6 +71,16 @@ export class ContextBuilder {
                     } else if (content.imageData) {
                         console.log(`  Found base64 image data in message ${msgIndex}`);
                         imageAddresses.push('[Base64 encoded image data]');
+                    }
+                } else if (content.type === 'text' && content.text) {
+                    // Extract image URLs from text content using regex
+                    const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico)(?:\?[^\s]*)?)/gi;
+                    const matches = content.text.match(urlRegex);
+                    if (matches) {
+                        matches.forEach(url => {
+                            console.log(`  Found image URL in text of message ${msgIndex}:`, url);
+                            imageAddresses.push(url);
+                        });
                     }
                 }
             });
@@ -151,6 +162,7 @@ export class ContextBuilder {
 
     /**
      * Extract all images from messages (both current and previous)
+     * Includes both structured image content and URLs found in text
      */
     extractAllImages(messages: Message[]): Array<{ url?: string; data?: string; source: 'previous' | 'current' }> {
         const images: Array<{ url?: string; data?: string; source: 'previous' | 'current' }> = [];
@@ -165,6 +177,18 @@ export class ContextBuilder {
                         data: content.imageData,
                         source: 'previous'
                     });
+                } else if (content.type === 'text' && content.text) {
+                    // Extract image URLs from text content
+                    const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico)(?:\?[^\s]*)?)/gi;
+                    const matches = content.text.match(urlRegex);
+                    if (matches) {
+                        matches.forEach(url => {
+                            images.push({
+                                url: url,
+                                source: 'previous'
+                            });
+                        });
+                    }
                 }
             });
         });
@@ -179,6 +203,18 @@ export class ContextBuilder {
                         data: content.imageData,
                         source: 'current'
                     });
+                } else if (content.type === 'text' && content.text) {
+                    // Extract image URLs from text content
+                    const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico)(?:\?[^\s]*)?)/gi;
+                    const matches = content.text.match(urlRegex);
+                    if (matches) {
+                        matches.forEach(url => {
+                            images.push({
+                                url: url,
+                                source: 'current'
+                            });
+                        });
+                    }
                 }
             });
         }

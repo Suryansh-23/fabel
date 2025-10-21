@@ -114,9 +114,9 @@ Provide a comprehensive response addressing both image and video generation need
             case 'video':
                 selectedPrompt = this.prompts.get('video-generation')!;
                 break;
-            case 'mixed':
-                selectedPrompt = this.prompts.get('mixed-media')!;
-                break;
+            // case 'mixed':
+            //     selectedPrompt = this.prompts.get('mixed-media')!;
+            //     break;
             case 'text':
             default:
                 selectedPrompt = this.prompts.get('text-conversation')!;

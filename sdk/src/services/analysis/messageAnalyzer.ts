@@ -97,7 +97,7 @@ Analyze this message and respond in the following JSON format:
 {
   "needsImageGeneration": boolean,
   "needsVideoGeneration": boolean,
-  "intent": "text" | "image" | "video" | "mixed",
+  "intent": "text" | "image" | "video",
   "confidence": number (0-1),
   "reasoning": "Brief explanation of your analysis"
 }

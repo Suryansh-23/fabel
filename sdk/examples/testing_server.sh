@@ -1,7 +1,7 @@
 BASE_URL="http://localhost:3000"
 
 
-# Testing the api/conversation endpoint
+# Testing the api/conversation endpoint ..... SUCCESS
 # echo "=== Example 1: Multi-User Conversation with Image Generation Request ==="
 # echo "Scenario: User-1 posts about SpaceX, User-2 requests image with @mentions, @fabel AI generates"
 # curl -X POST "$BASE_URL/api/conversation" \
@@ -42,7 +42,7 @@ BASE_URL="http://localhost:3000"
 #   }'
 
 
-# # Testing the api/conversation/concise endpoint of the server 
+# # Testing the api/conversation/concise endpoint of the server ........ SUCCESS 
 # echo -e "\n\n=== Example 8: Long Conversation with Concise Summary ==="
 # echo "Scenario: Long discussion thread, using concise endpoint"
 # curl -X POST "$BASE_URL/api/conversation/concise" \
@@ -73,60 +73,60 @@ BASE_URL="http://localhost:3000"
 #       {
 #         "role": "user",
 #         "username": "alice",
-#         "content": [{"type": "text", "text": "Yes! We need concept art"}]
+#         "content": [{"type": "text", "text": "Yes! We need concept art, I would take insipiration from this https://cdn.dribbble.com/userupload/40309342/file/original-ac70a24d8b562377d52855a34bf7aa72.png?resize=400x0"}]
 #       },
 #       {
 #         "role": "user",
 #         "username": "art_bot",
-#         "content": [{"type": "text", "text": "Generate futuristic gaming concept art for a web3 platform"}]
+#         "content": [{"type": "text", "text": "Take insipiration from the above image & generate the Platform design for FabelGames with Logo FG"}]
 #       }
 #     ]
 #   }'
 
 
 # Prompt with Image reference inside the prompt ...., COMPLETE 
-echo -e "\n\n=== Example 2: Multi-User Thread with Image References ==="
-echo "Scenario: Multiple users discussing a design with image attachments"
-curl -X POST "$BASE_URL/api/conversation" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "messages": [
-      {
-        "role": "user",
-        "username": "designer_mike",
-        "content": [
-          {
-            "type": "text",
-            "text": "Check out this new location that i visited recently"
-          },
-          {
-            "type": "image",
-            "imageUrl": "https://travelchardham.com/sites/default/files/2024-12/Photos%20of%20Mussoorie%20Mall%20Road.jpg"
-          }
-        ]
-      },
-      {
-        "role": "user",
-        "username": "product_sarah",
-        "content": [
-          {
-            "type": "text",
-            "text": "Love it! Can we have some celebrety with it?"
-          }
-        ]
-      },
-      {
-        "role": "user",
-        "username": "ai_assistant",
-        "content": [
-          {
-            "type": "text",
-            "text": "I want A photorealistic image of Elon Musk standing in front of this sign."
-          }
-        ]
-      }
-    ]
-  }'
+# echo -e "\n\n=== Example 2: Multi-User Thread with Image References ==="
+# echo "Scenario: Multiple users discussing a design with image attachments"
+# curl -X POST "$BASE_URL/api/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "messages": [
+#       {
+#         "role": "user",
+#         "username": "designer_mike",
+#         "content": [
+#           {
+#             "type": "text",
+#             "text": "Check out this new location that i visited recently"
+#           },
+#           {
+#             "type": "image",
+#             "imageUrl": "https://travelchardham.com/sites/default/files/2024-12/Photos%20of%20Mussoorie%20Mall%20Road.jpg"
+#           }
+#         ]
+#       },
+#       {
+#         "role": "user",
+#         "username": "product_sarah",
+#         "content": [
+#           {
+#             "type": "text",
+#             "text": "Love it! Can we have some celebrety with it?"
+#           }
+#         ]
+#       },
+#       {
+#         "role": "user",
+#         "username": "ai_assistant",
+#         "content": [
+#           {
+#             "type": "text",
+#             "text": "I want A photorealistic image of Elon Musk standing in front of this sign."
+#           }
+#         ]
+#       }
+#     ]
+#   }'
 
 # echo -e "\n\n=== Example 3: Video Generation Request in Team Chat ==="
 # echo "Scenario: Team discussing product demo video"
@@ -160,7 +160,7 @@ curl -X POST "$BASE_URL/api/conversation" \
 #         "content": [
 #           {
 #             "type": "text",
-#             "text": "Generate a 60-second video animation showcasing our top 3 features with smooth transitions"
+#             "text": "Generate a 10-second video animation showcasing our top 3 features with smooth transitions"
 #           }
 #         ]
 #       }
@@ -328,3 +328,236 @@ curl -X POST "$BASE_URL/api/conversation" \
 #   }'
 
 # echo -e "\n\n=== Done! ===\"
+
+echo -e "\n\n=========================================="
+echo "=== NEW V2 API EXAMPLES (InputContext/Output format) ==="
+echo "=========================================="
+
+# Example 1: Simple image generation with new format
+# echo -e "\n\n=== V2 Example 1: Simple Image Generation Request ==="
+# echo "Scenario: User requests image generation using new InputContext format"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "context": [
+#       {
+#         "depth": 0,
+#         "userMsg": {
+#           "handle": "@user123",
+#           "username": "John Doe",
+#           "msg": "Generate a beautiful sunset over mountains"
+#         }
+#       }
+#     ]
+#   }'
+
+# Example 2: Multi-depth conversation with image generation
+# echo -e "\n\n=== V2 Example 2: Multi-User Conversation Thread ==="
+# echo "Scenario: Multiple users in conversation, last one requests image"
+curl -X POST "$BASE_URL/api/v2/conversation" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "context": [
+      {
+        "depth": 0,
+        "userMsg": {
+          "handle": "@alice",
+          "username": "Alice",
+          "msg": "I just visited SpaceX headquarters!"
+        }
+      },
+      {
+        "depth": 1,
+        "userMsg": {
+          "handle": "@bob",
+          "username": "Bob",
+          "msg": "Wow! That must have been amazing. Wish I could see Jesse pollak, here his image there with elon musk",
+          "media": "https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75"
+        }
+      },
+      {
+        "depth": 2,
+        "userMsg": {
+          "handle": "@fabel",
+          "username": "Fabel AI",
+          "msg": "Generate an image for the above need"
+        }
+      }
+    ]
+  }'
+
+# Example 3: Conversation with image URL reference
+echo -e "\n\n=== V2 Example 3: Message with Image URL Media ==="
+echo "Scenario: User shares image URL and requests enhancement"
+curl -X POST "$BASE_URL/api/v2/conversation" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "context": [
+      {
+        "depth": 0,
+        "userMsg": {
+          "handle": "@photographer",
+          "username": "Sarah Photo",
+          "msg": "Here is a photo of my recent visit to an hill station",
+          "media": "https://travelchardham.com/sites/default/files/2024-12/Photos%20of%20Mussoorie%20Mall%20Road.jpg"
+        }
+      },
+      {
+        "depth": 1,
+        "userMsg": {
+          "handle": "@fabel",
+          "username": "Photo Editor",
+          "msg": "Generate an image of Jesse Pollak in the above image",
+          "media": "https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75"
+        }
+      }
+    ]
+  }'
+
+# # Example 4: Video generation request
+# echo -e "\n\n=== V2 Example 4: Video Generation Request ==="
+# echo "Scenario: Team requesting video animation"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "context": [
+#       {
+#         "depth": 0,
+#         "userMsg": {
+#           "handle": "@marketing",
+#           "username": "Marketing Team",
+#           "msg": "We need a promotional video for our new product launch"
+#         }
+#       },
+#       {
+#         "depth": 1,
+#         "userMsg": {
+#           "handle": "@ceo",
+#           "username": "Jane CEO",
+#           "msg": "Make it 30 seconds, highlighting our key features"
+#         }
+#       },
+#       {
+#         "depth": 2,
+#         "userMsg": {
+#           "handle": "@video_ai",
+#           "username": "Video Bot",
+#           "msg": "Create a 30-second promotional video showcasing product features with smooth animations"
+#         }
+#       }
+#     ]
+#   }'
+
+# # Example 5: NFT/Web3 community interaction
+# echo -e "\n\n=== V2 Example 5: NFT Community Artwork Request ==="
+# echo "Scenario: Web3 community discussing NFT art"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "context": [
+#       {
+#         "depth": 0,
+#         "userMsg": {
+#           "handle": "@crypto_whale",
+#           "username": "Crypto Whale",
+#           "msg": "Just minted 100 NFTs on Base! 🚀"
+#         }
+#       },
+#       {
+#         "depth": 1,
+#         "userMsg": {
+#           "handle": "@artist",
+#           "username": "Digital Artist",
+#           "msg": "Congrats! Would love to see a cyberpunk version"
+#         }
+#       },
+#       {
+#         "depth": 2,
+#         "userMsg": {
+#           "handle": "@art_ai",
+#           "username": "Art AI",
+#           "msg": "Generate cyberpunk NFT artwork with neon colors and futuristic city"
+#         }
+#       }
+#     ]
+#   }'
+
+# # Example 6: Text-only conversation
+# echo -e "\n\n=== V2 Example 6: Simple Text Conversation ==="
+# echo "Scenario: Pure text discussion without media generation"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "context": [
+#       {
+#         "depth": 0,
+#         "userMsg": {
+#           "handle": "@dev_john",
+#           "username": "Developer John",
+#           "msg": "How do I fix CORS errors in Express?"
+#         }
+#       },
+#       {
+#         "depth": 1,
+#         "userMsg": {
+#           "handle": "@senior_dev",
+#           "username": "Senior Dev",
+#           "msg": "Explain the cors middleware setup and configuration"
+#         }
+#       }
+#     ]
+#   }'
+
+# # Example 7: Long conversation thread
+# echo -e "\n\n=== V2 Example 7: Long Conversation Thread ==="
+# echo "Scenario: Extended discussion with multiple participants"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "context": [
+#       {
+#         "depth": 0,
+#         "userMsg": {
+#           "handle": "@designer",
+#           "username": "Mike Designer",
+#           "msg": "Working on a new logo for our brand"
+#         }
+#       },
+#       {
+#         "depth": 1,
+#         "userMsg": {
+#           "handle": "@product",
+#           "username": "Product Manager",
+#           "msg": "Make sure it reflects our modern, tech-forward identity"
+#         }
+#       },
+#       {
+#         "depth": 2,
+#         "userMsg": {
+#           "handle": "@ceo",
+#           "username": "CEO",
+#           "msg": "I want it to have blue and purple gradients"
+#         }
+#       },
+#       {
+#         "depth": 3,
+#         "userMsg": {
+#           "handle": "@marketing",
+#           "username": "Marketing",
+#           "msg": "And include our tagline: Innovation First"
+#         }
+#       },
+#       {
+#         "depth": 4,
+#         "userMsg": {
+#           "handle": "@ai_designer",
+#           "username": "AI Designer",
+#           "msg": "Generate a modern tech logo with blue-purple gradient and Innovation First tagline"
+#         }
+#       }
+#     ]
+#   }'
+
+echo -e "\n\n=========================================="
+echo "=== All V2 API Tests Complete! ==="
+echo "=========================================="

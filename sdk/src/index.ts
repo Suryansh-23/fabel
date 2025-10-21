@@ -1,129 +1,77 @@
-import express from 'express';
-import { ENV } from './config/env';
 import { ConversationProcessor } from './services/conversationProcessor';
-import { ConversationContext } from './types/conversation';
-
-const app = express();
-app.use(express.json());
-
-const conversationProcessor = new ConversationProcessor();
-
-/**
- * POST /api/conversation
- * Receives conversation context via cURL
- * - Analyzes last message for image/video generation intent
- * - Builds summary from messages 0 to N-1
- * - Routes to appropriate prompt with context
- */
-app.post('/api/conversation', async (req, res) => {
-    try {
-        const conversationContext: ConversationContext = req.body;
-        console.log('conversationContext', conversationContext);
-        
-
-        // Validation of the conversation context 
-        if (!conversationContext.messages || !Array.isArray(conversationContext.messages)) {
-            return res.status(400).json({
-                error: 'Invalid request: messages array is required'
-            });
-        }
-        if (conversationContext.messages.length === 0) {
-            return res.status(400).json({
-                error: 'Invalid request: at least one message is required'
-            });
-        }
-
-        // Process the conversation using Gemini for intent analysis
-        const result = await conversationProcessor.process(conversationContext);
-        res.json({
-            success: true,
-            data: {
-                analysis: result.analysis,
-                selectedPrompt: {
-                    id: result.selectedPrompt.id,
-                    name: result.selectedPrompt.name
-                },
-                summary: result.summary,
-                finalPrompt: result.finalPrompt,
-                lastMessage: result.lastMessage
-            }
-        });
-    } catch (error) {
-        console.error('Error processing conversation:', error);
-        res.status(500).json({
-            error: 'Internal server error',
-            message: error instanceof Error ? error.message : 'Unknown error'
-        });
-    }
-});
+import {
+    InputContext,
+    Output,
+    TypeConverter,
+    UserMsg,
+    OutputType,
+    MessageContent,
+    Message,
+    ConversationContext,
+    AnalysisResult,
+    PromptTemplate,
+    ProcessedRequest
+} from './types/conversation';
 
 /**
- * POST /api/conversation/concise
- * Same as /api/conversation but with concise summary for long conversations
+ * Main SDK function to process conversational context and generate output
+ *
+ * @param inputContext - The conversation context with user messages
+ * @returns Promise<Output> - The generated output (text, image, or video)
+ *
+ * @example
+ * ```typescript
+ * const result = await imagine({
+ *   context: [
+ *     {
+ *       depth: 0,
+ *       userMsg: {
+ *         handle: 'john_doe',
+ *         username: 'John Doe',
+ *         msg: 'Create a sunset over mountains',
+ *       }
+ *     }
+ *   ]
+ * });
+ *
+ * if (result.outputType === OutputType.Image) {
+ *   console.log('Generated image:', result.image);
+ * }
+ * ```
  */
-app.post('/api/conversation/concise', async (req, res) => {
-    try {
-        const conversationContext: ConversationContext = req.body;
-        const maxMessages = req.body.maxMessages || 5;
+export async function imagine(inputContext: InputContext): Promise<Output> {
+    // Convert new type system to legacy type system
+    const conversationContext = TypeConverter.inputContextToConversationContext(inputContext);
 
-        if (!conversationContext.messages || !Array.isArray(conversationContext.messages)) {
-            return res.status(400).json({
-                error: 'Invalid request: messages array is required'
-            });
-        }
+    // Process the conversation
+    const processor = new ConversationProcessor();
+    const processedRequest = await processor.process(conversationContext);
 
-        if (conversationContext.messages.length === 0) {
-            return res.status(400).json({
-                error: 'Invalid request: at least one message is required'
-            });
-        }
+    // Convert processed request to output
+    const output = TypeConverter.processedRequestToOutput(processedRequest);
 
-        const result = await conversationProcessor.processConcise(conversationContext, maxMessages);
+    return output;
+}
 
-        res.json({
-            success: true,
-            data: {
-                analysis: result.analysis,
-                selectedPrompt: {
-                    id: result.selectedPrompt.id,
-                    name: result.selectedPrompt.name
-                },
-                summary: result.summary,
-                finalPrompt: result.finalPrompt,
-                lastMessage: result.lastMessage
-            }
-        });
-    } catch (error) {
-        console.error('Error processing conversation:', error);
-        res.status(500).json({
-            error: 'Internal server error',
-            message: error instanceof Error ? error.message : 'Unknown error'
-        });
-    }
-});
+// Export all types for SDK consumers
+export {
+    // Core input/output types
+    InputContext,
+    Output,
+    UserMsg,
+    OutputType,
 
-/**
- * GET /api/prompts
- * List all available prompt templates
- */
-app.get('/api/prompts', (_, res) => {
-    const router = conversationProcessor.getRouter();
-    const prompts = router.listPrompts();
+    // Legacy types for advanced usage
+    MessageContent,
+    Message,
+    ConversationContext,
+    AnalysisResult,
+    PromptTemplate,
+    ProcessedRequest,
 
-    res.json({
-        success: true,
-        data: prompts
-    });
-});
+    // Type converter utility
+    TypeConverter,
 
-/**
- * GET /health
- * Health check endpoint
- */
-app.get('/health', (_, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-app.listen(ENV.PORT, () => {
-    console.log(`Server running on port ${ENV.PORT}`);
-});
+    // Service classes for advanced customization
+    ConversationProcessor
+};

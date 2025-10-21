@@ -47,8 +47,7 @@ export class ConversationProcessor {
         console.log('Routing Analysis: ', analysis);
 
         // Step 3: Build summary from messages 0 to N-1 (conversational context)
-        // ***************** Not optimised to the full potential *****************
-        const summary = this.summarizer.summarize(messages);
+        const summary = await this.summarizer.summarize(messages);
         console.log('Summary: ', summary);
 
         // Step 4: Route to appropriate prompt based on analysis
@@ -115,7 +114,7 @@ export class ConversationProcessor {
         const lastMessage = messages[messages.length - 1];
         const conversationHistory = messages.slice(0, -1);
         const analysis = await this.analyzer.analyzeMessage(lastMessage, conversationHistory);
-        const summary = this.summarizer.summarizeConcise(messages, maxMessages);
+        const summary = await this.summarizer.summarize(messages, maxMessages);
         const selectedPrompt = this.router.route(analysis);
         const placeholders = this.contextBuilder.buildPlaceholders(messages, summary);
         const finalPrompt = this.contextBuilder.fillTemplate(selectedPrompt, placeholders);
