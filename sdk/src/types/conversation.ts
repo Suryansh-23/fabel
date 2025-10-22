@@ -23,8 +23,10 @@ export interface Output {
     outputType: OutputType;
     text?: string;
     image?: string; // PNG file path or URL
-    video?: Blob;
+    video?: string; // MP4 file path
 }
+
+
 
 
 
@@ -75,6 +77,11 @@ export interface ProcessedRequest {
     generatedImage?: {
         imageUrl: string;
         imagePath?: string;
+        prompt: string;
+    };
+    generatedVideo?: {
+        videoPath: string;
+        videoData?: Buffer;
         prompt: string;
     };
 }
@@ -148,11 +155,11 @@ export class TypeConverter {
                 // Return the PNG file path if available, otherwise the image URL
                 image: processedRequest.generatedImage.imagePath || processedRequest.generatedImage.imageUrl
             };
-        } else if (analysis.needsVideoGeneration) {
+        } else if (analysis.needsVideoGeneration && processedRequest.generatedVideo) {
             return {
                 outputType: OutputType.Video,
+                video: processedRequest.generatedVideo.videoPath,
                 text: processedRequest.finalPrompt
-                // video generation would be implemented here
             };
         } else {
             return {

@@ -39,21 +39,51 @@ export class ContextBuilder {
     }
 
     /**
-     * Extract the current message text from the last message
+     * Extract the current message text and image URLs from the last message
      */
     private extractCurrentMessage(lastMessage: Message): string {
+        const parts: string[] = [];
+
+        // Extract text content
         const textContents = lastMessage.content
             .filter(c => c.type === 'text' && c.text)
             .map(c => c.text)
             .join('\n');
 
-        return textContents || '[No text content]';
+        if (textContents) {
+            parts.push(textContents);
+        }
+
+        // Extract image URLs from the last message
+        const imageUrls: string[] = [];
+        lastMessage.content.forEach(content => {
+            if (content.type === 'image') {
+                if (content.imageUrl) {
+                    // Skip blob URLs as they cannot be accessed from Node.js
+                    if (content.imageUrl.startsWith('blob:')) {
+                        imageUrls.push('[Blob URL - not accessible from server]');
+                    } else {
+                        imageUrls.push(content.imageUrl);
+                    }
+                } else if (content.imageData) {
+                    imageUrls.push('[Base64 encoded image]');
+                }
+            }
+        });
+
+        // Add image URLs to the message
+        if (imageUrls.length > 0) {
+            parts.push(`\n[Images in current message: ${imageUrls.join(', ')}]`);
+        }
+
+        return parts.length > 0 ? parts.join('\n') : '[No text content]';
     }
 
     /**
      * Extract image context from all messages
      * Extracts images from content array where type is 'image'
      * Also extracts image URLs found in text content
+     * Filters out blob URLs as they cannot be accessed from Node.js
      */
     private extractImageContext(messages: Message[]): string {
         const imageAddresses: string[] = [];
@@ -66,8 +96,14 @@ export class ContextBuilder {
                 if (content.type === 'image') {
                     // Extract imageUrl or imageData from image content
                     if (content.imageUrl) {
-                        console.log(`  Found image URL in message ${msgIndex}:`, content.imageUrl);
-                        imageAddresses.push(content.imageUrl);
+                        // Skip blob URLs
+                        if (content.imageUrl.startsWith('blob:')) {
+                            console.log(`  ⚠️  Skipping blob URL in message ${msgIndex}:`, content.imageUrl);
+                            imageAddresses.push('[Blob URL - not accessible from server]');
+                        } else {
+                            console.log(`  Found image URL in message ${msgIndex}:`, content.imageUrl);
+                            imageAddresses.push(content.imageUrl);
+                        }
                     } else if (content.imageData) {
                         console.log(`  Found base64 image data in message ${msgIndex}`);
                         imageAddresses.push('[Base64 encoded image data]');
@@ -163,6 +199,7 @@ export class ContextBuilder {
     /**
      * Extract all images from messages (both current and previous)
      * Includes both structured image content and URLs found in text
+     * Filters out blob URLs as they cannot be accessed from Node.js
      */
     extractAllImages(messages: Message[]): Array<{ url?: string; data?: string; source: 'previous' | 'current' }> {
         const images: Array<{ url?: string; data?: string; source: 'previous' | 'current' }> = [];
@@ -172,11 +209,20 @@ export class ContextBuilder {
         previousMessages.forEach(msg => {
             msg.content.forEach(content => {
                 if (content.type === 'image') {
-                    images.push({
-                        url: content.imageUrl,
-                        data: content.imageData,
-                        source: 'previous'
-                    });
+                    // Skip blob URLs
+                    if (content.imageUrl && !content.imageUrl.startsWith('blob:')) {
+                        images.push({
+                            url: content.imageUrl,
+                            data: content.imageData,
+                            source: 'previous'
+                        });
+                    } else if (content.imageData) {
+                        // Include base64 data even without URL
+                        images.push({
+                            data: content.imageData,
+                            source: 'previous'
+                        });
+                    }
                 } else if (content.type === 'text' && content.text) {
                     // Extract image URLs from text content
                     const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico)(?:\?[^\s]*)?)/gi;
@@ -198,11 +244,20 @@ export class ContextBuilder {
             const lastMessage = messages[messages.length - 1];
             lastMessage.content.forEach(content => {
                 if (content.type === 'image') {
-                    images.push({
-                        url: content.imageUrl,
-                        data: content.imageData,
-                        source: 'current'
-                    });
+                    // Skip blob URLs
+                    if (content.imageUrl && !content.imageUrl.startsWith('blob:')) {
+                        images.push({
+                            url: content.imageUrl,
+                            data: content.imageData,
+                            source: 'current'
+                        });
+                    } else if (content.imageData) {
+                        // Include base64 data even without URL
+                        images.push({
+                            data: content.imageData,
+                            source: 'current'
+                        });
+                    }
                 } else if (content.type === 'text' && content.text) {
                     // Extract image URLs from text content
                     const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico)(?:\?[^\s]*)?)/gi;

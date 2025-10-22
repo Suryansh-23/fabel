@@ -21,9 +21,9 @@ export class ConversationSummarizer {
         });
     }
     /**
-     * Build a summary from messages 0 to N-1 (all messages except the last one)
-     * The last message (index N) is used to determine prompt routing (image/video/text)
-     * Messages 0 to N-1 provide conversational context leading up to the current request
+     * Build a summary from all messages (0 to N) including the last message
+     * The last message and any images it contains are now included in the summary
+     * to provide complete context for the generation process
      */
 
     /**
@@ -32,7 +32,7 @@ export class ConversationSummarizer {
      * Uses LLM summarization when conversation exceeds maxMessages threshold
      * Generates context that fits in approximately maxMessages worth of content
      *
-     * @param messages - Array of messages to summarize
+     * @param messages - Array of messages to summarize (includes all messages 0 to N)
      * @param maxMessages - Maximum number of messages before triggering LLM summarization (default: 5)
      * @param useLLM - Whether to use LLM summarization (default: true)
      * @returns Summary string or Promise<string>
@@ -42,16 +42,13 @@ export class ConversationSummarizer {
             return 'No previous conversation context.';
         }
 
-        // Get all messages except the last one (0 to N-1)
-        const previousMessages = messages.slice(0, -1);
-
-        if (previousMessages.length === 0) {
-            return 'This is the first message in the conversation.';
-        }
+        // Include ALL messages (0 to N) including the last message
+        // This ensures any images in the last message are part of the summary
+        const allMessages = messages;
 
         // If conversation is short enough or LLM is disabled, return simple summary
-        if (previousMessages.length <= maxMessages || !useLLM) {
-            return this.formatMessagesForSummary(previousMessages);
+        if (allMessages.length <= maxMessages || !useLLM) {
+            return this.formatMessagesForSummary(allMessages);
         }
 
         // Try LLM summarization with retry logic
@@ -60,8 +57,8 @@ export class ConversationSummarizer {
 
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             try {
-                // Build the conversation for LLM to summarize
-                const conversationText = this.buildConversationTextForLLM(previousMessages);
+                // Build the conversation for LLM to summarize (including last message)
+                const conversationText = this.buildConversationTextForLLM(allMessages);
 
                 // Create the summarization prompt
                 const prompt = this.buildSummarizationPrompt(conversationText, maxMessages);
@@ -102,7 +99,7 @@ export class ConversationSummarizer {
 
         // Fallback to simple truncation if all retries failed
         console.log('Falling back to simple message formatting');
-        return this.formatMessagesForSummary(previousMessages.slice(-maxMessages));
+        return this.formatMessagesForSummary(allMessages.slice(-maxMessages));
     }
 
     /**

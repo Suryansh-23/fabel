@@ -44,30 +44,39 @@ export class ImageGenerator {
             let contents: any;
 
             if (imageUrl) {
-                // Fetch the image from URL and convert to base64
-                console.log('Fetching reference image from URL...');
-                const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-                const imageBase64 = Buffer.from(imageResponse.data, 'binary').toString('base64');
+                // Check if the URL is a blob URL (browser-specific, cannot be fetched from Node.js)
+                if (imageUrl.startsWith('blob:')) {
+                    console.warn('⚠️  Blob URL detected:', imageUrl);
+                    console.warn('⚠️  Blob URLs are browser-specific memory references and cannot be accessed from Node.js server.');
+                    console.warn('⚠️  Skipping reference image. Please provide an HTTP/HTTPS URL or base64 data instead.');
+                    // Continue without reference image
+                    contents = prompt;
+                } else {
+                    // Fetch the image from URL and convert to base64
+                    console.log('Fetching reference image from URL...');
+                    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+                    const imageBase64 = Buffer.from(imageResponse.data, 'binary').toString('base64');
 
                 // Determine MIME type from response headers or URL extension
-                const contentType = imageResponse.headers['content-type'] || 'image/jpeg';
-                console.log('Reference image fetched, MIME type:', contentType);
+                    const contentType = imageResponse.headers['content-type'] || 'image/jpeg';
+                    console.log('Reference image fetched, MIME type:', contentType);
 
-                // Construct multimodal contents with both text and image
-                contents = [
-                    {
-                        role: 'user',
-                        parts: [
-                            { text: prompt }, // The text prompt
-                            {
-                                inlineData: { // The reference image
-                                    mimeType: contentType,
-                                    data: imageBase64
+                    // Construct multimodal contents with both text and image
+                    contents = [
+                        {
+                            role: 'user',
+                            parts: [
+                                { text: prompt }, // The text prompt
+                                {
+                                    inlineData: { // The reference image
+                                        mimeType: contentType,
+                                        data: imageBase64
+                                    }
                                 }
-                            }
-                        ]
-                    }
-                ];
+                            ]
+                        }
+                    ];
+                }
             } else {
                 // Text-only prompt
                 contents = prompt;

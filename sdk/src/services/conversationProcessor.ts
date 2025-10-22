@@ -4,6 +4,7 @@ import { ConversationSummarizer } from './analysis/conversationSummarizer';
 import { PromptRouter } from './promptRouter';
 import { ContextBuilder } from './contextBuilder';
 import { ImageGenerator } from './generation/imageGenerator';
+import { VideoGenerator } from './generation/videoGenerator';
 
 export class ConversationProcessor {
     private analyzer: MessageAnalyzer;
@@ -11,6 +12,7 @@ export class ConversationProcessor {
     private router: PromptRouter;
     private contextBuilder: ContextBuilder;
     private imageGenerator: ImageGenerator;
+    private videoGenerator: VideoGenerator;
 
     constructor() {
         this.analyzer = new MessageAnalyzer();
@@ -18,6 +20,7 @@ export class ConversationProcessor {
         this.router = new PromptRouter();
         this.contextBuilder = new ContextBuilder();
         this.imageGenerator = new ImageGenerator();
+        this.videoGenerator = new VideoGenerator();
     }
 
     /**
@@ -64,6 +67,8 @@ export class ConversationProcessor {
 
         // For current testing always true
         let generatedImage;
+        let generatedVideo;
+
         if (analysis.needsImageGeneration) {
             console.log('Generating image with final prompt...');
 
@@ -91,13 +96,31 @@ export class ConversationProcessor {
             }
         }
 
+        if (analysis.needsVideoGeneration) {
+            console.log('Generating video with final prompt...');
+
+            const videoResult = await this.videoGenerator.generateVideo(finalPrompt);
+            if (videoResult.success && videoResult.videoPath) {
+                generatedVideo = {
+                    videoPath: videoResult.videoPath,
+                    videoData: videoResult.videoData,
+                    prompt: finalPrompt
+                };
+                console.log('Video generated successfully');
+                console.log('Saved to:', videoResult.videoPath);
+            } else {
+                console.error('Video generation failed:', videoResult.error);
+            }
+        }
+
         return {
             lastMessage,
             summary,
             analysis,
             selectedPrompt,
             finalPrompt,
-            generatedImage
+            generatedImage,
+            generatedVideo
         };
     }
 
@@ -121,6 +144,8 @@ export class ConversationProcessor {
 
         // Generate image if needed
         let generatedImage;
+        let generatedVideo;
+
         if (analysis.needsImageGeneration) {
             console.log('Generating image with final prompt...');
 
@@ -148,13 +173,31 @@ export class ConversationProcessor {
             }
         }
 
+        if (analysis.needsVideoGeneration) {
+            console.log('Generating video with final prompt...');
+
+            const videoResult = await this.videoGenerator.generateVideo(finalPrompt);
+            if (videoResult.success && videoResult.videoPath) {
+                generatedVideo = {
+                    videoPath: videoResult.videoPath,
+                    videoData: videoResult.videoData,
+                    prompt: finalPrompt
+                };
+                console.log('Video generated successfully');
+                console.log('Saved to:', videoResult.videoPath);
+            } else {
+                console.error('Video generation failed:', videoResult.error);
+            }
+        }
+
         return {
             lastMessage,
             summary,
             analysis,
             selectedPrompt,
             finalPrompt,
-            generatedImage
+            generatedImage,
+            generatedVideo
         };
     }
 

@@ -352,8 +352,8 @@ echo "=========================================="
 #   }'
 
 # Example 2: Multi-depth conversation with image generation
-# echo -e "\n\n=== V2 Example 2: Multi-User Conversation Thread ==="
-# echo "Scenario: Multiple users in conversation, last one requests image"
+echo -e "\n\n=== V2 Example 2: Multi-User Conversation Thread ==="
+echo "Scenario: Multiple users in conversation, last one requests image"
 curl -X POST "$BASE_URL/api/v2/conversation" \
   -H "Content-Type: application/json" \
   -d '{
@@ -387,34 +387,34 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
   }'
 
 # Example 3: Conversation with image URL reference
-echo -e "\n\n=== V2 Example 3: Message with Image URL Media ==="
-echo "Scenario: User shares image URL and requests enhancement"
-curl -X POST "$BASE_URL/api/v2/conversation" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "context": [
-      {
-        "depth": 0,
-        "userMsg": {
-          "handle": "@photographer",
-          "username": "Sarah Photo",
-          "msg": "Here is a photo of my recent visit to an hill station",
-          "media": "https://travelchardham.com/sites/default/files/2024-12/Photos%20of%20Mussoorie%20Mall%20Road.jpg"
-        }
-      },
-      {
-        "depth": 1,
-        "userMsg": {
-          "handle": "@fabel",
-          "username": "Photo Editor",
-          "msg": "Generate an image of Jesse Pollak in the above image",
-          "media": "https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75"
-        }
-      }
-    ]
-  }'
+# echo -e "\n\n=== V2 Example 3: Message with Image URL Media ==="
+# echo "Scenario: User shares image URL and requests enhancement"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "context": [
+#       {
+#         "depth": 0,
+#         "userMsg": {
+#           "handle": "@photographer",
+#           "username": "Sarah Photo",
+#           "msg": "Here is a photo of my recent visit to an hill station",
+#           "media": "blob:https://gemini.google.com/37c93167-27d7-4f0c-b1d8-7945e9410cb2"
+#         }
+#       },
+#       {
+#         "depth": 1,
+#         "userMsg": {
+#           "handle": "@fabel",
+#           "username": "AI agent",
+#           "msg": "Generate an image of Jesse Pollak attached to Image ahead, in the before image of the place",
+#           "media": "https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75"
+#         }
+#       }
+#     ]
+#   }'
 
-# # Example 4: Video generation request
+# Example 4: Video generation request
 # echo -e "\n\n=== V2 Example 4: Video Generation Request ==="
 # echo "Scenario: Team requesting video animation"
 # curl -X POST "$BASE_URL/api/v2/conversation" \
@@ -434,7 +434,7 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
 #         "userMsg": {
 #           "handle": "@ceo",
 #           "username": "Jane CEO",
-#           "msg": "Make it 30 seconds, highlighting our key features"
+#           "msg": "Make a sample video before that, using the prompt below"
 #         }
 #       },
 #       {
@@ -442,7 +442,7 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
 #         "userMsg": {
 #           "handle": "@video_ai",
 #           "username": "Video Bot",
-#           "msg": "Create a 30-second promotional video showcasing product features with smooth animations"
+#           "msg": "The scene is a rain-slicked, crumbling street in a forgotten city, shrouded in perpetual twilight. Giant, bioluminescent mushrooms have sprouted from the cracked asphalt, casting an eerie, pulsating green and purple glow onto the decaying facades of skeletal skyscrapers. A gentle, constant rain creates shimmering reflections in the puddles below, and the only sounds are the soft patter of rain and a low, otherworldly hum from the glowing fungi"
 #         }
 #       }
 #     ]

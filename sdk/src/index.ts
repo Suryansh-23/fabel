@@ -75,3 +75,7 @@ export {
     // Service classes for advanced customization
     ConversationProcessor
 };
+
+// Export generator services
+export { ImageGenerator } from './services/generation/imageGenerator';
+export { VideoGenerator } from './services/generation/videoGenerator';
