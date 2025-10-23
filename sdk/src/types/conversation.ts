@@ -84,6 +84,10 @@ export interface ProcessedRequest {
         videoData?: Buffer;
         prompt: string;
     };
+    generatedText?: {
+        text: string;
+        prompt: string;
+    };
 }
 
 // Conversion utilities between old and new type systems
@@ -123,8 +127,8 @@ export class TypeConverter {
         if (userMsg.media) {
             // Detect if it's a video URL
             const isVideoUrl = userMsg.media.match(/\.(mp4|webm|ogg|mov|avi)(\?.*)?$/i) ||
-                              userMsg.media.includes('youtube.com') ||
-                              userMsg.media.includes('vimeo.com');
+                userMsg.media.includes('youtube.com') ||
+                userMsg.media.includes('vimeo.com');
 
             if (isVideoUrl) {
                 content.push({
@@ -164,7 +168,7 @@ export class TypeConverter {
         } else {
             return {
                 outputType: OutputType.Text,
-                text: processedRequest.finalPrompt
+                text: processedRequest.generatedText?.text || processedRequest.finalPrompt
             };
         }
     }

@@ -24,6 +24,9 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@ai-sdk/google-vertex": "^3.0.49",
     "@google/genai": "^1.25.0",

@@ -5,6 +5,7 @@ import { PromptRouter } from './promptRouter';
 import { ContextBuilder } from './contextBuilder';
 import { ImageGenerator } from './generation/imageGenerator';
 import { VideoGenerator } from './generation/videoGenerator';
+import { TextGenerator } from './generation/textGenerator';
 
 export class ConversationProcessor {
     private analyzer: MessageAnalyzer;
@@ -13,6 +14,7 @@ export class ConversationProcessor {
     private contextBuilder: ContextBuilder;
     private imageGenerator: ImageGenerator;
     private videoGenerator: VideoGenerator;
+    private textGenerator: TextGenerator;
 
     constructor() {
         this.analyzer = new MessageAnalyzer();
@@ -21,6 +23,7 @@ export class ConversationProcessor {
         this.contextBuilder = new ContextBuilder();
         this.imageGenerator = new ImageGenerator();
         this.videoGenerator = new VideoGenerator();
+        this.textGenerator = new TextGenerator();
     }
 
     /**
@@ -68,6 +71,7 @@ export class ConversationProcessor {
         // For current testing always true
         let generatedImage;
         let generatedVideo;
+        let generatedText;
 
         if (analysis.needsImageGeneration) {
             console.log('Generating image with final prompt...');
@@ -113,6 +117,22 @@ export class ConversationProcessor {
             }
         }
 
+        // Generate text response for text conversations
+        if (analysis.intent === 'text' && !analysis.needsImageGeneration && !analysis.needsVideoGeneration) {
+            console.log('Generating text response with final prompt...');
+
+            const textResult = await this.textGenerator.generateText(finalPrompt);
+            if (textResult.success && textResult.text) {
+                generatedText = {
+                    text: textResult.text,
+                    prompt: finalPrompt
+                };
+                console.log('Text generated successfully');
+            } else {
+                console.error('Text generation failed:', textResult.error);
+            }
+        }
+
         return {
             lastMessage,
             summary,
@@ -120,7 +140,8 @@ export class ConversationProcessor {
             selectedPrompt,
             finalPrompt,
             generatedImage,
-            generatedVideo
+            generatedVideo,
+            generatedText
         };
     }
 
@@ -145,6 +166,7 @@ export class ConversationProcessor {
         // Generate image if needed
         let generatedImage;
         let generatedVideo;
+        let generatedText;
 
         if (analysis.needsImageGeneration) {
             console.log('Generating image with final prompt...');
@@ -190,6 +212,22 @@ export class ConversationProcessor {
             }
         }
 
+        // Generate text response for text conversations
+        if (analysis.intent === 'text' && !analysis.needsImageGeneration && !analysis.needsVideoGeneration) {
+            console.log('Generating text response with final prompt...');
+
+            const textResult = await this.textGenerator.generateText(finalPrompt);
+            if (textResult.success && textResult.text) {
+                generatedText = {
+                    text: textResult.text,
+                    prompt: finalPrompt
+                };
+                console.log('Text generated successfully');
+            } else {
+                console.error('Text generation failed:', textResult.error);
+            }
+        }
+
         return {
             lastMessage,
             summary,
@@ -197,7 +235,8 @@ export class ConversationProcessor {
             selectedPrompt,
             finalPrompt,
             generatedImage,
-            generatedVideo
+            generatedVideo,
+            generatedText
         };
     }
 

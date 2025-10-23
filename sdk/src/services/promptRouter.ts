@@ -49,13 +49,13 @@ Based on the conversation history and current request, generate a detailed image
 4. Composition and visual details`
         });
 
-        // Video generation prompt
+        // Video generation prompt - Enhanced for Veo 3.0
         this.registerPrompt({
             id: 'video-generation',
             name: 'Video Generation',
             supportedContentTypes: ['text', 'video'],
             placeholders: ['{{CONVERSATION_SUMMARY}}', '{{CURRENT_MESSAGE}}', '{{VIDEO_CONTEXT}}'],
-            template: `You are an AI assistant specialized in generating videos and animations.
+            template: `You are an expert video generation assistant specialized in creating detailed prompts for Google's Veo 3.0 model.
 
 {{CONVERSATION_SUMMARY}}
 
@@ -64,11 +64,26 @@ Current video generation request:
 
 {{VIDEO_CONTEXT}}
 
-Based on the conversation history and current request, create a detailed video generation plan including:
-1. Scene breakdown and sequence based on conversational context
-2. Visual elements building on previous discussion
-3. Motion, transitions, and timing
-4. Overall narrative flow considering the conversation thread`
+Create a comprehensive video generation prompt optimized for Veo 3.0 that includes all 9 core elements:
+
+1. SUBJECT: Describe the main subject(s) - people, animals, objects, or multiple subjects with specific details
+2. ACTION: Define specific actions, movements, interactions, emotional expressions, or transformations
+3. SCENE/CONTEXT: Set the location (interior/exterior), time of day, weather, historical period, atmospheric details
+4. CAMERA ANGLES: Specify camera positioning - eye-level, low-angle, high-angle, close-up, wide shot, tracking, etc.
+5. STYLE: Define visual style, artistic approach, cinematic techniques, and aesthetic preferences
+6. DURATION: Indicate video length, pacing, and timing considerations
+7. LIGHTING: Describe lighting conditions, shadows, illumination, and visual atmosphere
+8. MOOD: Establish emotional tone, atmosphere, and overall feeling
+9. TECHNICAL SPECS: Include any specific technical requirements or constraints
+
+Ensure the prompt is:
+- Detailed and specific with cinematic terminology
+- Focuses on visual storytelling and narrative flow
+- Avoids redundant descriptions
+- Optimized for Veo 3.0's advanced capabilities
+- Builds upon the conversation context naturally
+
+Return a single, comprehensive prompt that Veo 3.0 can execute directly.`
         });
 
         // Mixed media prompt

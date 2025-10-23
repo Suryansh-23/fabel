@@ -79,3 +79,4 @@ export {
 // Export generator services
 export { ImageGenerator } from './services/generation/imageGenerator';
 export { VideoGenerator } from './services/generation/videoGenerator';
+export { TextGenerator } from './services/generation/textGenerator';

@@ -352,39 +352,39 @@ echo "=========================================="
 #   }'
 
 # Example 2: Multi-depth conversation with image generation
-echo -e "\n\n=== V2 Example 2: Multi-User Conversation Thread ==="
-echo "Scenario: Multiple users in conversation, last one requests image"
-curl -X POST "$BASE_URL/api/v2/conversation" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "context": [
-      {
-        "depth": 0,
-        "userMsg": {
-          "handle": "@alice",
-          "username": "Alice",
-          "msg": "I just visited SpaceX headquarters!"
-        }
-      },
-      {
-        "depth": 1,
-        "userMsg": {
-          "handle": "@bob",
-          "username": "Bob",
-          "msg": "Wow! That must have been amazing. Wish I could see Jesse pollak, here his image there with elon musk",
-          "media": "https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75"
-        }
-      },
-      {
-        "depth": 2,
-        "userMsg": {
-          "handle": "@fabel",
-          "username": "Fabel AI",
-          "msg": "Generate an image for the above need"
-        }
-      }
-    ]
-  }'
+# echo -e "\n\n=== V2 Example 2: Multi-User Conversation Thread ==="
+# echo "Scenario: Multiple users in conversation, last one requests image"
+# curl -X POST "$BASE_URL/api/v2/conversation" \
+#   -H "Content-Type: application/json" \
+#   -d "{
+#     \"context\": [
+#       {
+#         \"depth\": 0,
+#         \"userMsg\": {
+#           \"handle\": \"@alice\",
+#           \"username\": \"Alice\",
+#           \"msg\": \"I just visited SpaceX headquarters!\"
+#         }
+#       },
+#       {
+#         \"depth\": 1,
+#         \"userMsg\": {
+#           \"handle\": \"@bob\",
+#           \"username\": \"Bob\",
+#           \"msg\": \"Wow! That must have been amazing. Wish I could see Jesse pollak, here his image there with elon musk\",
+#           \"media\": \"https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75\"
+#         }
+#       },
+#       {
+#         \"depth\": 2,
+#         \"userMsg\": {
+#           \"handle\": \"@fabel\",
+#           \"username\": \"Fabel AI\",
+#           \"msg\": \"Generate an image of Jesse Pollak with elon at the SpaceX station\"
+#         }
+#       }
+#     ]
+#   }"
 
 # Example 3: Conversation with image URL reference
 # echo -e "\n\n=== V2 Example 3: Message with Image URL Media ==="
@@ -399,7 +399,7 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
 #           "handle": "@photographer",
 #           "username": "Sarah Photo",
 #           "msg": "Here is a photo of my recent visit to an hill station",
-#           "media": "blob:https://gemini.google.com/37c93167-27d7-4f0c-b1d8-7945e9410cb2"
+#           "media": "https://travelchardham.com/sites/default/files/2024-12/Mall%20Road%20Mussoorie.jpg"
 #         }
 #       },
 #       {
@@ -407,48 +407,48 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
 #         "userMsg": {
 #           "handle": "@fabel",
 #           "username": "AI agent",
-#           "msg": "Generate an image of Jesse Pollak attached to Image ahead, in the before image of the place",
+#           "msg": "Using the provided images, place Jesse Pollak from image 2 onto the location in image 1. Ensure that the features of Image 2 are photorealistically remain completely unchanged in image 1. The added element should be Jesse Pollak should look like a man walking on the location in Image 1.",
 #           "media": "https://fortune.com/img-assets/wp-content/uploads/2024/05/JessePollack-Base-044.jpg?w=1440&q=75"
 #         }
 #       }
 #     ]
 #   }'
 
-# Example 4: Video generation request
-# echo -e "\n\n=== V2 Example 4: Video Generation Request ==="
-# echo "Scenario: Team requesting video animation"
-# curl -X POST "$BASE_URL/api/v2/conversation" \
-#   -H "Content-Type: application/json" \
-#   -d '{
-#     "context": [
-#       {
-#         "depth": 0,
-#         "userMsg": {
-#           "handle": "@marketing",
-#           "username": "Marketing Team",
-#           "msg": "We need a promotional video for our new product launch"
-#         }
-#       },
-#       {
-#         "depth": 1,
-#         "userMsg": {
-#           "handle": "@ceo",
-#           "username": "Jane CEO",
-#           "msg": "Make a sample video before that, using the prompt below"
-#         }
-#       },
-#       {
-#         "depth": 2,
-#         "userMsg": {
-#           "handle": "@video_ai",
-#           "username": "Video Bot",
-#           "msg": "The scene is a rain-slicked, crumbling street in a forgotten city, shrouded in perpetual twilight. Giant, bioluminescent mushrooms have sprouted from the cracked asphalt, casting an eerie, pulsating green and purple glow onto the decaying facades of skeletal skyscrapers. A gentle, constant rain creates shimmering reflections in the puddles below, and the only sounds are the soft patter of rain and a low, otherworldly hum from the glowing fungi"
-#         }
-#       }
-#     ]
-#   }'
+# Example 4: Video generation request  ..... 
+echo -e "\n\n=== V2 Example 4: Video Generation Request ==="
+echo "Scenario: Team requesting video animation"
+curl -X POST "$BASE_URL/api/v2/conversation" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "context": [
+      {
+        "depth": 0,
+        "userMsg": {
+          "handle": "@marketing",
+          "username": "Marketing Team",
+          "msg": "We need a promotional video for our new product launch"
+        }
+      },
+      {
+        "depth": 1,
+        "userMsg": {
+          "handle": "@ceo",
+          "username": "Jane CEO",
+          "msg": "Make a sample video before that, using the prompt below"
+        }
+      },
+      {
+        "depth": 2,
+        "userMsg": {
+          "handle": "@video_ai",
+          "username": "Video Bot",
+          "msg": "The scene is a rain-slicked, crumbling street in a forgotten city, shrouded in perpetual twilight. Giant, bioluminescent mushrooms have sprouted from the cracked asphalt, casting an eerie, pulsating green and purple glow onto the decaying facades of skeletal skyscrapers. A gentle, constant rain creates shimmering reflections in the puddles below, and the only sounds are the soft patter of rain and a low, otherworldly hum from the glowing fungi"
+        }
+      }
+    ]
+  }'
 
-# # Example 5: NFT/Web3 community interaction
+# # Example 5: NFT/Web3 community interaction ✅
 # echo -e "\n\n=== V2 Example 5: NFT Community Artwork Request ==="
 # echo "Scenario: Web3 community discussing NFT art"
 # curl -X POST "$BASE_URL/api/v2/conversation" \
@@ -482,7 +482,7 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
 #     ]
 #   }'
 
-# # Example 6: Text-only conversation
+# # Example 6: Text-only conversation ..... ✅
 # echo -e "\n\n=== V2 Example 6: Simple Text Conversation ==="
 # echo "Scenario: Pure text discussion without media generation"
 # curl -X POST "$BASE_URL/api/v2/conversation" \
@@ -508,7 +508,7 @@ curl -X POST "$BASE_URL/api/v2/conversation" \
 #     ]
 #   }'
 
-# # Example 7: Long conversation thread
+# # Example 7: Long conversation thread ...... ✅
 # echo -e "\n\n=== V2 Example 7: Long Conversation Thread ==="
 # echo "Scenario: Extended discussion with multiple participants"
 # curl -X POST "$BASE_URL/api/v2/conversation" \
