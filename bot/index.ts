@@ -1,13 +1,24 @@
-import { NeynarFrameCreationReqBody } from "@neynar/nodejs-sdk/build/api";
+import "dotenv/config";
 import express from "express";
-import neynarClient from "./utils/neynarClient";
+import { globalIdempotency } from "./queue/idempotency";
+import { globalJobQueue } from "./queue/jobQueue";
+import { extractContextFromWebhook } from "./services/contextExtractor";
+import { generateFromContext } from "./services/generationService";
+import {
+  buildInputContext,
+  shouldIncludePfp,
+} from "./services/inputContextBuilder";
+import { publishImageReply, publishTextReply } from "./services/publisher";
+import { uploadImageToCdn } from "./utils/cdn";
+import logger from "./utils/logger";
+import { loadEnv } from "./utils/env";
+
+// Validate environment before accepting any requests
+const ENV = loadEnv();
 
 const app = express();
-const port = process.env.PORT || 3000;
-const signer = process.env.SIGNER_UUID;
-if (!signer) {
-  throw new Error("Make sure you set SIGNER_UUID in your .env file");
-}
+const port = ENV.PORT;
+const signer = ENV.SIGNER_UUID;
 
 // Middleware
 app.use(express.text());
@@ -23,110 +34,109 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  try {
-    const hookData = req.body;
-    console.log("Received hook data:", JSON.stringify(hookData, null, 2));
+  const hookData = req.body;
+  const mentionHash = hookData?.data?.hash;
+  const parentHash = hookData?.data?.parent_hash ?? null;
+  const authorFid = hookData?.data?.author?.fid;
+  logger.info("Webhook: received cast.created", {
+    mentionHash,
+    parentHash,
+    authorFid,
+  });
 
-    // const creationRequest = {
-    //   name: "gm",
-    //   pages: [
-    //     {
-    //       image: {
-    //         url: "https://remote-image.decentralized-content.com/image?url=https%3A%2F%2Fipfs.decentralized-content.com%2Fipfs%2Fbafybeifjdrcl2p4kmfv2uy3i2wx2hlxxn4hft3apr37lctiqsfdixjy3qi&w=1920&q=75",
-    //         aspect_ratio: "1.91:1",
-    //       },
-    //       title: "Neynar NFT minting frame",
-    //       buttons: [
-    //         {
-    //           action_type: "mint",
-    //           title: "Mint",
-    //           index: 1,
-    //           next_page: {
-    //             mint_url:
-    //               "eip155:8453:0x23687d295fd48db3e85248b734ea9e8fb3fced27:1",
-    //           },
-    //         },
-    //       ],
-    //       input: {
-    //         text: {
-    //           enabled: false,
-    //         },
-    //       },
-    //       uuid: "gm",
-    //       version: "vNext",
-    //     },
-    //   ],
-    // };
+  // Always ack immediately
+  res.json({ ok: true, received: true, mentionHash });
 
-    const creationRequest = {
-      signerUuid: signer,
-      name: `gm ${hookData.data.author.username}`,
-      pages: [
-        {
-          image: {
-            url: "https://moralis.io/wp-content/uploads/web3wiki/638-gm/637aeda23eca28502f6d3eae_61QOyzDqTfxekyfVuvH7dO5qeRpU50X-Hs46PiZFReI.jpeg",
-            aspect_ratio: "1:1",
-          },
-          title: "Page title",
-          buttons: [],
-          input: {
-            text: {
-              enabled: false,
-            },
-          },
-          uuid: "gm",
-          version: "vNext",
-        },
-      ],
-    };
-    const reply = await neynarClient.publishCast({
-      signerUuid: signer,
-      text: `gm ${hookData.data.author.username}`,
-      embeds: [
-        {
-          url: "https://moralis.io/wp-content/uploads/web3wiki/638-gm/637aeda23eca28502f6d3eae_61QOyzDqTfxekyfVuvH7dO5qeRpU50X-Hs46PiZFReI.jpeg",
-        },
-      ],
-      parent: hookData.data.hash,
-    });
-    // console.log("Published frame:", JSON.stringify(frame, null, 2));
-
-    // if (!process.env.SIGNER_UUID) {
-    //   throw new Error("Make sure you set SIGNER_UUID in your .env file");
-    // }
-
-    // const reply = await neynarClient.publishCast({
-    //   signerUuid: process.env.SIGNER_UUID,
-    //   text: `gm ${hookData.data.author.username}`,
-    //   embeds: [
-    //     {
-    //       url: frame.cast.,
-    //     },
-    //   ],
-    //   parent: hookData.data.hash,
-    // });
-    console.log("Published reply cast:", JSON.stringify(reply, null, 2));
-
-    res.send(`Replied to the cast with hash: ${reply.cast.hash}`);
-  } catch (e: any) {
-    console.log("Error handling request:", e);
-    console.log(JSON.stringify(req.body, null, 2));
-    res.status(500).send(e.message);
+  if (!mentionHash) {
+    logger.warn("Webhook: missing mention hash, aborting");
+    return;
   }
+
+  const idState = globalIdempotency.get(mentionHash);
+  if (
+    idState &&
+    (idState.status === "in_progress" || idState.status === "done")
+  ) {
+    logger.info("Idempotency: already processing or done, skipping", {
+      mentionHash,
+      status: idState.status,
+    });
+    return;
+  }
+  globalIdempotency.set(mentionHash, "queued");
+
+  globalJobQueue.enqueue(mentionHash, async () => {
+    globalIdempotency.set(mentionHash, "in_progress");
+    try {
+      logger.info("Job start", { mentionHash, parentHash });
+
+      // 1) Extract context
+      const { parentCast, parentImages } = await extractContextFromWebhook(
+        hookData
+      );
+
+      // 2) Determine PFP rule
+      const includePfp = shouldIncludePfp(hookData?.data?.text || "");
+
+      // 3) Build InputContext
+      const inputContext = buildInputContext({
+        mentionCast: hookData.data,
+        parentCast,
+        parentImages,
+        includePfp,
+      });
+
+      // 4) Generate via SDK imagine
+      const gen = await generateFromContext(inputContext);
+      if (!gen.ok) {
+        logger.error("Generation failed", { mentionHash, error: gen.error });
+        await publishTextReply({
+          signerUuid: signer!,
+          parentHash: mentionHash,
+          text: "Sorry, I couldn't generate an image right now.",
+          idemKey: mentionHash,
+        });
+        globalIdempotency.set(mentionHash, "failed");
+        return;
+      }
+
+      if (gen.type === "image") {
+        // 5) Upload to CDN
+        const imageUrl = await uploadImageToCdn({
+          filePath: gen.imagePath,
+          base64DataUrl: gen.imageDataUrl,
+        });
+
+        // 6) Publish plain image embed reply
+        await publishImageReply({
+          signerUuid: signer!,
+          parentHash: mentionHash,
+          imageUrl,
+          idemKey: mentionHash,
+        });
+        globalIdempotency.set(mentionHash, "done");
+        logger.info("Job complete (image)", { mentionHash, imageUrl });
+        return;
+      }
+
+      // Fallback: publish text reply (skip image)
+      await publishTextReply({
+        signerUuid: signer!,
+        parentHash: mentionHash,
+        text: gen.text,
+        idemKey: mentionHash,
+      });
+      globalIdempotency.set(mentionHash, "done");
+      logger.info("Job complete (text fallback)", { mentionHash });
+    } catch (e: any) {
+      logger.error("Job error", { mentionHash, error: e?.message });
+      globalIdempotency.set(mentionHash, "failed");
+    }
+  });
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Server is running on http://localhost:${port}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
-});
-
-// Graceful shutdown handling
-process.on("SIGINT", () => {
-  console.log("\n👋 Received SIGINT. Graceful shutdown...");
-  process.exit(0);
-});
-
-process.on("SIGTERM", () => {
-  console.log("\n👋 Received SIGTERM. Graceful shutdown...");
-  process.exit(0);
+  logger.info(`🚀 Server is running on http://localhost:${port}`);
+  logger.info(`📝 Environment: ${ENV.NODE_ENV}`);
+  logger.info("Queue configured", { concurrency: 5, maxSize: 15 });
 });

@@ -22,7 +22,7 @@ export enum OutputType {
 export interface Output {
     outputType: OutputType;
     text?: string;
-    image?: string; // PNG file path or URL
+    image?: string; // data URL (data:image/png;base64,...) or remote URL
     video?: string; // MP4 file path
 }
 
@@ -76,7 +76,6 @@ export interface ProcessedRequest {
     finalPrompt: string;
     generatedImage?: {
         imageUrl: string;
-        imagePath?: string;
         prompt: string;
     };
     generatedVideo?: {
@@ -156,8 +155,8 @@ export class TypeConverter {
         if (analysis.needsImageGeneration && processedRequest.generatedImage) {
             return {
                 outputType: OutputType.Image,
-                // Return the PNG file path if available, otherwise the image URL
-                image: processedRequest.generatedImage.imagePath || processedRequest.generatedImage.imageUrl
+                // Return the image data URL or remote URL
+                image: processedRequest.generatedImage.imageUrl
             };
         } else if (analysis.needsVideoGeneration && processedRequest.generatedVideo) {
             return {
@@ -166,9 +165,11 @@ export class TypeConverter {
                 text: processedRequest.finalPrompt
             };
         } else {
+            // Do NOT leak internal prompt templates to callers.
+            // Prefer model-generated text if present; otherwise return a safe placeholder.
             return {
                 outputType: OutputType.Text,
-                text: processedRequest.generatedText?.text || processedRequest.finalPrompt
+                text: processedRequest.generatedText?.text || 'No result generated.'
             };
         }
     }

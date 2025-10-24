@@ -252,8 +252,8 @@ Provide a concise summary that preserves the essential context and all media URL
             userMessages: previousMessages.filter(m => m.role === 'user').length,
             assistantMessages: previousMessages.filter(m => m.role === 'assistant').length,
             systemMessages: previousMessages.filter(m => m.role === 'system').length,
-            imagesShared: previousMessages.reduce((count, msg) => {
-                return count + msg.content.filter(c => c.type === 'image').length;
+            imagesShared: previousMessages.reduce((count: number, msg: Message) => {
+                return count + msg.content.filter((c: MessageContent) => c.type === 'image').length;
             }, 0)
         };
     }

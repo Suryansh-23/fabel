@@ -86,3 +86,6 @@ temp/
 .yarn-integrity
 
 fabel-36401-fe691721a8d7.json
+
+# pnpm files
+v10

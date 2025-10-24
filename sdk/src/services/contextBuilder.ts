@@ -1,4 +1,4 @@
-import { Message, PromptTemplate } from '../types/conversation';
+import { Message, PromptTemplate, MessageContent } from '../types/conversation';
 
 export interface ContextPlaceholders {
     [key: string]: string;
@@ -91,8 +91,8 @@ export class ContextBuilder {
         console.log('extractImageContext - Total messages:', messages.length);
 
         // Search through all messages
-        messages.forEach((msg, msgIndex) => {
-            msg.content.forEach((content, _) => {
+        messages.forEach((msg: Message, msgIndex: number) => {
+            msg.content.forEach((content: MessageContent, _idx: number) => {
                 if (content.type === 'image') {
                     // Extract imageUrl or imageData from image content
                     if (content.imageUrl) {
@@ -113,7 +113,7 @@ export class ContextBuilder {
                     const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico)(?:\?[^\s]*)?)/gi;
                     const matches = content.text.match(urlRegex);
                     if (matches) {
-                        matches.forEach(url => {
+                        matches.forEach((url: string) => {
                             console.log(`  Found image URL in text of message ${msgIndex}:`, url);
                             imageAddresses.push(url);
                         });
@@ -131,7 +131,7 @@ export class ContextBuilder {
 
         const parts: string[] = [`${imageAddresses.length} image(s) included in the request:`];
 
-        imageAddresses.forEach((address, index) => {
+        imageAddresses.forEach((address: string, index: number) => {
             parts.push(`Image ${index + 1}: ${address}`);
         });
 
@@ -145,10 +145,10 @@ export class ContextBuilder {
     private extractVideoContext(messages: Message[]): string {
         const previousMessages = messages.slice(0, -1);
 
-        const videoRelatedMessages = previousMessages.filter(msg => {
+        const videoRelatedMessages = previousMessages.filter((msg: Message) => {
             const text = msg.content
-                .filter(c => c.type === 'text' && c.text)
-                .map(c => c.text?.toLowerCase() || '')
+                .filter((c: MessageContent) => c.type === 'text' && c.text)
+                .map((c: MessageContent) => c.text?.toLowerCase() || '')
                 .join(' ');
 
             return text.includes('video') || text.includes('duration') ||

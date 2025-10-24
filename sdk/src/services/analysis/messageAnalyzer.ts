@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { Message, AnalysisResult } from '../../types/conversation';
+import { Message, AnalysisResult, MessageContent } from '../../types/conversation';
 
 export class MessageAnalyzer {
     private client: GoogleGenAI;
@@ -76,10 +76,10 @@ Analyze the following message and determine if it requires:
         // Add conversation history context if available
         if (conversationHistory && conversationHistory.length > 0) {
             prompt += `Conversation history:\n`;
-            conversationHistory.forEach((msg, idx) => {
+            conversationHistory.forEach((msg: Message, idx: number) => {
                 const username = msg.username ? `@${msg.username}` : msg.role;
                 const textContent = this.extractTextContent(msg);
-                const hasImages = msg.content.some(c => c.type === 'image');
+                const hasImages = msg.content.some((c: MessageContent) => c.type === 'image');
                 prompt += `${idx + 1}. ${username}: ${textContent}${hasImages ? ' [includes image(s)]' : ''}\n`;
             });
             prompt += `\n`;
@@ -88,7 +88,7 @@ Analyze the following message and determine if it requires:
         // Add the current message
         const username = lastMessage.username ? `@${lastMessage.username}` : 'User';
         const textContent = this.extractTextContent(lastMessage);
-        const hasImages = lastMessage.content.some(c => c.type === 'image');
+        const hasImages = lastMessage.content.some((c: MessageContent) => c.type === 'image');
 
         prompt += `Current message to analyze:
 ${username}: ${textContent}${hasImages ? ' [includes image(s)]' : ''}
@@ -120,8 +120,8 @@ Respond ONLY with valid JSON, no other text.`;
      */
     private extractTextContent(message: Message): string {
         return message.content
-            .filter(c => c.type === 'text' && c.text)
-            .map(c => c.text)
+            .filter((c: MessageContent) => c.type === 'text' && c.text)
+            .map((c: MessageContent) => c.text)
             .join(' ');
     }
 

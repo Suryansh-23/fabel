@@ -88,13 +88,9 @@ export class ConversationProcessor {
             if (imageResult.success && imageResult.imageUrl) {
                 generatedImage = {
                     imageUrl: imageResult.imageUrl,
-                    imagePath: imageResult.imagePath,
                     prompt: finalPrompt
                 };
                 console.log('Image generated successfully');
-                if (imageResult.imagePath) {
-                    console.log('Saved to:', imageResult.imagePath);
-                }
             } else {
                 console.error('Image generation failed:', imageResult.error);
             }
@@ -183,13 +179,9 @@ export class ConversationProcessor {
             if (imageResult.success && imageResult.imageUrl) {
                 generatedImage = {
                     imageUrl: imageResult.imageUrl,
-                    imagePath: imageResult.imagePath,
                     prompt: finalPrompt
                 };
                 console.log('Image generated successfully');
-                if (imageResult.imagePath) {
-                    console.log('Saved to:', imageResult.imagePath);
-                }
             } else {
                 console.error('Image generation failed:', imageResult.error);
             }

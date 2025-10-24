@@ -1,13 +1,10 @@
 import { GoogleGenAI, Modality } from '@google/genai';
-import * as fs from 'fs';
-import * as path from 'path';
 import axios from 'axios';
 
 export interface ImageGenerationResult {
     success: boolean;
-    imageUrl?: string;
-    imageData?: string; // base64 encoded
-    imagePath?: string; // file system path
+    imageUrl?: string; // data URL (data:image/png;base64,...)
+    imageData?: string; // base64 encoded (raw)
     error?: string;
 }
 
@@ -114,55 +111,29 @@ export class ImageGenerator {
             if (imageData) {
                 // imageData might be a Buffer or a base64 string
                 let base64Image: string;
-                let imageBuffer: Buffer;
+                // let imageBuffer: Buffer;
 
                 if (Buffer.isBuffer(imageData)) {
                     // If it's already a Buffer, convert to base64
                     base64Image = imageData.toString('base64');
-                    imageBuffer = imageData;
+                    // imageBuffer = imageData;
                 } else if (typeof imageData === 'string') {
                     // If it's a base64 string, use it directly
                     base64Image = imageData;
-                    imageBuffer = Buffer.from(imageData, 'base64');
+                    // imageBuffer = Buffer.from(imageData, 'base64');
                 } else {
                     // Unknown format, try to convert
                     base64Image = String(imageData);
-                    imageBuffer = Buffer.from(base64Image, 'base64');
+                    // imageBuffer = Buffer.from(base64Image, 'base64');
                 }
 
                 const imageDataUrl = `data:image/png;base64,${base64Image}`;
-
-                // Save to output folder
-                const timestamp = Date.now();
-                const outputDir = path.join(__dirname, '../../output');
-                const fileName = `generated_image_${timestamp}.png`;
-                const filePath = path.join(outputDir, fileName);
-
-                try {
-                    // Ensure output directory exists
-                    if (!fs.existsSync(outputDir)) {
-                        fs.mkdirSync(outputDir, { recursive: true });
-                    }
-
-                    // Write binary image data to file
-                    fs.writeFileSync(filePath, imageBuffer);
-                    console.log(`Image saved to: ${filePath}`);
-
-                    return {
-                        success: true,
-                        imageData: base64Image,
-                        imageUrl: imageDataUrl,
-                        imagePath: filePath,
-                    };
-                } catch (saveError) {
-                    console.error('Error saving image file:', saveError);
-                    // Still return success with image data even if file save fails
-                    return {
-                        success: true,
-                        imageData: base64Image,
-                        imageUrl: imageDataUrl,
-                    };
-                }
+                // Do not write to filesystem; return data only
+                return {
+                    success: true,
+                    imageData: base64Image,
+                    imageUrl: imageDataUrl,
+                };
             }
 
             return {
