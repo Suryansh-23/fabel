@@ -176,3 +176,4 @@ dist
 
 # pnpm
 v10
+.vercel
