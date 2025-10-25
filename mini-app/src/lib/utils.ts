@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Manifest } from "@farcaster/miniapp-core/src/manifest";
 import {
   APP_BUTTON_TEXT,
   APP_DESCRIPTION,
@@ -15,6 +14,22 @@ import {
   APP_WEBHOOK_URL,
   APP_ACCOUNT_ASSOCIATION,
 } from "./constants";
+
+// Local type definition for Manifest to avoid dependency issues
+type Manifest = {
+  accountAssociation?: any;
+  miniapp: {
+    version: string;
+    name: string;
+    homeUrl: string;
+    iconUrl: string;
+    imageUrl: string;
+    buttonTitle: string;
+    splashImageUrl: string;
+    splashBackgroundColor: string;
+    webhookUrl: string;
+  };
+};
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

@@ -1,5 +1,3 @@
-import { type AccountAssociation } from "@farcaster/miniapp-core/src/manifest";
-
 /**
  * Application constants and configuration values.
  *
@@ -72,8 +70,7 @@ export const APP_SPLASH_BACKGROUND_COLOR: string = "#f7f7f7";
  * Used to associate the mini app with a Farcaster account.
  * If not provided, the mini app will be unsigned and have limited capabilities.
  */
-export const APP_ACCOUNT_ASSOCIATION: AccountAssociation | undefined =
-  undefined;
+export const APP_ACCOUNT_ASSOCIATION: any | undefined = undefined;
 
 // --- UI Configuration ---
 /**
