@@ -1,4 +1,5 @@
 packages:
-  - 'bot'
-  - 'sdk'
-  - 'mini-app'
+  - "bot"
+  - "sdk"
+  - "mini-app"
+  - "fabel"
